@@ -1,0 +1,62 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+model Home {
+  id            Int             @id @default(autoincrement())
+  location      String
+  startDate     DateTime?
+  endDate       DateTime?
+  propertyType  String?         
+  requirements  String[]        @default([])
+  additionalNotes String?
+  images        String[]        @default([])
+  title         String
+  description   String
+  rent          Int           
+  contact       String
+  userId        Int
+  user          User            @relation(fields: [userId], references: [id])
+  bookings      Booking[]
+  availableDates AvailableDate[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+}
+
+model AvailableDate {
+  id        Int      @id @default(autoincrement())
+  startDate DateTime
+  endDate   DateTime
+  homeId    Int
+  Home      Home     @relation(fields: [homeId], references: [id])
+}
+
+model User {
+  id    Int     @id @default(autoincrement())
+  username  String  @unique
+  email String  @unique
+  password  String
+  phone  String
+  homes Home[]
+  booking Booking[]
+}
+model Booking {
+  id        Int     @id @default(autoincrement())
+  homeId    Int
+  userId    Int
+  startDate DateTime
+  endDate   DateTime
+  totalPrice Float
+  Home      Home    @relation(fields: [homeId], references: [id])
+  User      User    @relation(fields: [userId], references: [id])
+}
